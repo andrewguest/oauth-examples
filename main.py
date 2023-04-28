@@ -17,7 +17,11 @@ def get_access_token(request_token: str) -> str:
     CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
     url = "https://github.com/login/oauth/access_token"
-    query_params = {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET, "code": request_token}
+    query_params = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "code": request_token,
+    }
     headers = {"Accept": "application/json"}
 
     response = requests.post(url, headers=headers, params=query_params)
@@ -44,7 +48,9 @@ def get_user_data(access_token: str) -> dict:
 # This returns a one-time authorization code to your CALLBACK URL.
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "client_id": os.getenv("CLIENT_ID")})
+    return templates.TemplateResponse(
+        "index.html", {"request": request, "client_id": os.getenv("CLIENT_ID")}
+    )
 
 
 # STEP 2 - Receive the one-time AUTHORIZATION code from Github as a query parameter.
@@ -58,6 +64,7 @@ async def index(request: Request):
 async def github_callback(request: Request, code: str):
     access_token = get_access_token(code)
     user_data = get_user_data(access_token)
-    print(user_data)
 
-    return templates.TemplateResponse("dashboard.html", {"request": request, "userData": user_data})
+    return templates.TemplateResponse(
+        "dashboard.html", {"request": request, "userData": user_data}
+    )
